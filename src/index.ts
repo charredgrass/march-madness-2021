@@ -106,7 +106,13 @@ for (let r of bdata.constants.REGION_IDS) {
 }
 
 //true = left win
-function whoWins(seedL, seedR) : boolean {
-    let s = Math.random() * 100 ;
-    return true;
+function whoWins(seedL, seedR) {
+    let s = Math.random() * 100;
+    let seedDiff = seedR - seedL; //how much more likely L is to win
+    //this is y = 0.21777777777x^2 + 50
+    //parabola vertex (0, 50) - seedDiff = 0 -> 50% chance L wins 
+    //passes through (15, 99) - seedDiff = 15 ->99% chance L wins
+    //forgot this needs to be cubic halfway through but we're rolling with it
+    let probabiltyLeftWins = 0.21777777777 * (seedDiff * Math.abs(seedDiff)) + 50
+    return (s < probabiltyLeftWins);
 }
