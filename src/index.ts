@@ -26,13 +26,15 @@ class Matchup {
     childRight: Matchup | null;
     parent: Matchup;
     winner: boolean;
-    constructor(p : Matchup) {
+    isLeft: boolean;
+    constructor(p : Matchup, isL : boolean) {
         this.left = null;
         this.right = null;
         this.childLeft = null;
         this.childRight = null;
         this.parent = p;
         this.winner = null;
+        this.isLeft = isL;
     }
     toString() {
         return (this.left ? this.left.toString() : "not populated(-)") 
@@ -52,13 +54,13 @@ class Matchup {
 
 for (let r of bdata.constants.REGION_IDS) {
     let cregion = bdata.bracket.regions[r].teams;
-    let regfinal : Matchup = new Matchup(null);
+    let regfinal : Matchup = new Matchup(null, true);
     let lowestLevel : Array<Matchup> = [regfinal];
     while (lowestLevel.length < (REG_SIZE / 2)) {
         let temp : Array<Matchup> = [];
         for (let m of lowestLevel) {
-            let left = new Matchup(m);
-            let right = new Matchup(m);
+            let left = new Matchup(m, true);
+            let right = new Matchup(m, false);
             temp.push(left);
             temp.push(right);
             m.childLeft = left;
@@ -77,8 +79,30 @@ for (let r of bdata.constants.REGION_IDS) {
     // for (let m of lowestLevel) {
     //     console.log(m.toString());
     // }
+
+    let currLevel : Array<Matchup> = lowestLevel;
+    while (currLevel.length > 1) {
+        let nextLevel : Array<Matchup> = [];
+        let toggle = true;
+        for (let m of currLevel) {
+            let winner : Team = (whoWins(m.left.seed, m.right.seed) === true ? m.left : m.right);
+            if (m.isLeft === true) {
+                m.parent.left = winner;
+            } else {
+                m.parent.right = winner;
+            }
+            if (toggle) {
+                nextLevel.push(m.parent);
+            }
+            toggle = !toggle;
+        }
+        currLevel = nextLevel;
+    }
+
+    console.log("region = " + r);
     console.log(regfinal.stringAll());
-    break;
+    
+    console.log("-------------------------------------");
 }
 
 //true = left win
