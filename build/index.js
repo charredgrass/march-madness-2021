@@ -28,7 +28,8 @@ var Matchup = (function () {
     Matchup.prototype.toString = function () {
         return (this.left ? this.left.toString() : "not populated(-)")
             + " vs " +
-            (this.right ? this.right.toString() : "not populated(-)");
+            (this.right ? this.right.toString() : "not populated(-)")
+            + " | W: " + (this.winner === true ? this.left.toString() : this.right.toString());
     };
     Matchup.prototype.stringAll = function () {
         return (this.childLeft ? this.childLeft.stringAll() : "") + "\n" +
@@ -68,13 +69,15 @@ for (var _i = 0, _a = bdata.constants.REGION_IDS; _i < _a.length; _i++) {
         var toggle = true;
         for (var _d = 0, currLevel_1 = currLevel; _d < currLevel_1.length; _d++) {
             var m = currLevel_1[_d];
-            var winner = (whoWins(m.left.seed, m.right.seed) === true ? m.left : m.right);
+            var w = whoWins(m.left.seed, m.right.seed);
+            var winner = (w === true ? m.left : m.right);
             if (m.isLeft === true) {
                 m.parent.left = winner;
             }
             else {
                 m.parent.right = winner;
             }
+            m.winner = w;
             if (toggle) {
                 nextLevel.push(m.parent);
             }
@@ -88,5 +91,7 @@ for (var _i = 0, _a = bdata.constants.REGION_IDS; _i < _a.length; _i++) {
 }
 function whoWins(seedL, seedR) {
     var s = Math.random() * 100;
-    return true;
+    var seedDiff = seedR - seedL;
+    var probabiltyLeftWins = 0.21777777777 * (seedDiff * Math.abs(seedDiff)) + 50;
+    return (s < probabiltyLeftWins);
 }

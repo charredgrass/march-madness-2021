@@ -39,7 +39,8 @@ class Matchup {
     toString() {
         return (this.left ? this.left.toString() : "not populated(-)") 
             + " vs " +
-            (this.right ? this.right.toString() : "not populated(-)");
+            (this.right ? this.right.toString() : "not populated(-)")
+            + " | W: " + (this.winner === true ? this.left.toString() : this.right.toString());
     }
 
     stringAll() {
@@ -85,12 +86,14 @@ for (let r of bdata.constants.REGION_IDS) {
         let nextLevel : Array<Matchup> = [];
         let toggle = true;
         for (let m of currLevel) {
-            let winner : Team = (whoWins(m.left.seed, m.right.seed) === true ? m.left : m.right);
+            let w = whoWins(m.left.seed, m.right.seed);
+            let winner : Team = (w === true ? m.left : m.right);
             if (m.isLeft === true) {
                 m.parent.left = winner;
             } else {
                 m.parent.right = winner;
             }
+            m.winner = w;
             if (toggle) {
                 nextLevel.push(m.parent);
             }
