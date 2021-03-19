@@ -32,9 +32,19 @@ var Matchup = (function () {
             + " | W: " + (this.winner === true ? this.left.toString() : this.right.toString());
     };
     Matchup.prototype.stringAll = function () {
-        return (this.childLeft ? this.childLeft.stringAll() : "") + "\n" +
-            this.toString() +
-            (this.childRight ? this.childRight.stringAll() : "");
+        var ret = "";
+        var queue = [this];
+        while (queue.length > 0) {
+            var curr = queue.shift();
+            if (curr.childLeft) {
+                queue.push(curr.childLeft);
+            }
+            if (curr.childRight) {
+                queue.push(curr.childRight);
+            }
+            ret += curr.toString() + "\n";
+        }
+        return ret;
     };
     return Matchup;
 }());
@@ -93,5 +103,11 @@ function whoWins(seedL, seedR) {
     var s = Math.random() * 100;
     var seedDiff = seedR - seedL;
     var probabiltyLeftWins = 0.21777777777 * (seedDiff * Math.abs(seedDiff)) + 50;
+    return (s < probabiltyLeftWins);
+}
+var winOddsBySeed = [99, 94, 85, 79, 64, 63, 61, 50, 50, 39, 37, 36, 21, 15, 6, 1];
+function whoWinsPrecise(seedL, seedR) {
+    var s = Math.random() * 100;
+    var probabiltyLeftWins = (winOddsBySeed[seedL - 1] + (100 - winOddsBySeed[seedR - 1])) / 2;
     return (s < probabiltyLeftWins);
 }

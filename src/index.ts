@@ -44,12 +44,25 @@ class Matchup {
     }
 
     stringAll() {
-        //this is flawed
-        //should be a level order traversal but this is inorder tree traversal
-        //which is way easier
-        return (this.childLeft ? this.childLeft.stringAll() : "") + "\n" +
-            this.toString() + 
-            (this.childRight ? this.childRight.stringAll() : "");
+        //level order traversal using breadth first search
+        let ret : String = "";
+        let queue : Array<Matchup> = [this];
+        while (queue.length > 0) {
+            let curr : Matchup = queue.shift();
+            if (curr.childLeft) {
+                queue.push(curr.childLeft);
+            }
+            if (curr.childRight) {
+                queue.push(curr.childRight);
+            }
+            ret += curr.toString() + "\n";
+        }
+
+        return ret;
+
+        // return (this.childLeft ? this.childLeft.stringAll() : "") + "\n" +
+        //     this.toString() + 
+        //     (this.childRight ? this.childRight.stringAll() : "");
     }
 }
 
@@ -117,5 +130,13 @@ function whoWins(seedL, seedR) {
     //passes through (15, 99) - seedDiff = 15 ->99% chance L wins
     //forgot this needs to be cubic halfway through but we're rolling with it
     let probabiltyLeftWins = 0.21777777777 * (seedDiff * Math.abs(seedDiff)) + 50
+    return (s < probabiltyLeftWins);
+}
+
+const winOddsBySeed = [99, 94, 85, 79, 64, 63, 61, 50, 50, 39, 37, 36, 21, 15, 6, 1];
+
+function whoWinsPrecise(seedL, seedR) {
+    let s = Math.random() * 100;
+    let probabiltyLeftWins = (winOddsBySeed[seedL - 1] + (100 - winOddsBySeed[seedR - 1])) / 2;
     return (s < probabiltyLeftWins);
 }
